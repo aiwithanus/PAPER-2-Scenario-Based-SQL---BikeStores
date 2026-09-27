@@ -14,19 +14,19 @@
 -- calculated net_line_revenue
 
 SELECT
-    o.order_id,
-    o.order_date,
-    CONCAT(c.first_name, ' ', c.last_name) AS customer_full_name,
-    s.store_name,
-    CONCAT(st.first_name, ' ', st.last_name) AS staff_full_name,
-    p.product_name,
-    cat.category_name,
-    b.brand_name,
+o.order_id,
+ o.order_date,
+CONCAT(c.first_name, ' ', c.last_name) AS customer_full_name,
+     s.store_name,
+     CONCAT(st.first_name, ' ', st.last_name) AS staff_full_name,
+  p.product_name,
+     cat.category_name,
+   b.brand_name,
     oi.quantity,
     oi.list_price,
     oi.discount,
     oi.quantity * oi.list_price * (1 - oi.discount) AS net_line_revenue
-FROM sales.orders AS o
+ FROM sales.orders AS o
 INNER JOIN sales.customers AS c
     ON o.customer_id = c.customer_id
 INNER JOIN sales.stores AS s
@@ -53,15 +53,14 @@ INNER JOIN production.brands AS b
 -- average order value
 
 SELECT
-    s.store_name,
+s.store_name,
     COUNT(DISTINCT o.order_id) AS number_of_distinct_orders,
-    SUM(oi.quantity) AS total_units_sold,
+ SUM(oi.quantity) AS total_units_sold,
     SUM(oi.quantity * oi.list_price * (1 - oi.discount)) AS total_net_revenue,
     SUM(oi.quantity * oi.list_price * (1 - oi.discount))
         / COUNT(DISTINCT o.order_id) AS average_order_value
 FROM sales.orders AS o
-INNER JOIN sales.stores AS s
-    ON o.store_id = s.store_id
+INNER JOIN sales.stores AS s    ON o.store_id = s.store_id
 INNER JOIN sales.order_items AS oi
     ON o.order_id = oi.order_id
 WHERE o.order_status = 4
@@ -98,14 +97,14 @@ WITH customer_spending AS
         c.last_name
 )
 SELECT
-    customer_id,
-    customer_name,
-    completed_order_count,
-    total_spending
+customer_id,
+ customer_name,
+  completed_order_count,
+  total_spending
 FROM customer_spending
 WHERE total_spending > (
     SELECT AVG(total_spending)
-    FROM customer_spending
+  FROM customer_spending
 )
 ORDER BY total_spending DESC;
 
@@ -129,7 +128,7 @@ FROM production.stocks AS st
 INNER JOIN production.products AS p
     ON st.product_id = p.product_id
 INNER JOIN sales.stores AS s
-    ON st.store_id = s.store_id
+ON st.store_id = s.store_id
 INNER JOIN production.categories AS c
     ON p.category_id = c.category_id
 INNER JOIN production.brands AS b
@@ -172,13 +171,13 @@ ranked_products AS
 (
     SELECT
         category_name,
-        product_name,
+            product_name,
         total_units_sold,
         total_net_revenue,
         DENSE_RANK() OVER
         (
             PARTITION BY category_name
-            ORDER BY total_net_revenue DESC
+ ORDER BY total_net_revenue DESC
         ) AS product_position
     FROM product_sales
 )
@@ -192,7 +191,7 @@ FROM ranked_products
 WHERE product_position <= 3
 ORDER BY
     category_name,
-    product_position;
+  product_position;
 
 
 -- ============================================================
